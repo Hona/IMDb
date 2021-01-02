@@ -69,13 +69,13 @@ namespace IMDb.Importer
         {
             var tasks = new List<Task>
             {
-                DownloadAndImportNameBasics(),
-                DownloadAndImportTitleAKAs(),
-                DownloadAndImportTitleBasics(),
-                DownloadAndImportTitleCrew(),
-                DownloadAndImportTitleEpisode(),
-                DownloadAndImportTitlePrincipals(),
-                DownloadAndImportTitleRatings()
+                DownloadAndImportType(_nameBasicsRepository),
+                DownloadAndImportType(_titleAKAsRepository),
+                DownloadAndImportType(_titleBasicsRepository),
+                DownloadAndImportType(_titleCrewRepository),
+                DownloadAndImportType(_titleEpisodeRepository),
+                DownloadAndImportType(_titlePrincipalsRepository),
+                DownloadAndImportType(_titleRatingsRepository)
             };
 
             await Task.WhenAll(tasks);
@@ -110,43 +110,6 @@ namespace IMDb.Importer
             return fileName;
         }
 
-        #region Individual Dataset Import Functions
-
-        private async Task DownloadAndImportNameBasics()
-        {
-            await DownloadAndImportType<NameBasics>(_nameBasicsRepository);
-        }
-
-        private async Task DownloadAndImportTitleAKAs()
-        {
-            await DownloadAndImportType<TitleAKAs>(_titleAKAsRepository);
-        }
-
-        private async Task DownloadAndImportTitleBasics()
-        {
-            await DownloadAndImportType<TitleBasics>(_titleBasicsRepository);
-        }
-
-        private async Task DownloadAndImportTitleCrew()
-        {
-            await DownloadAndImportType<TitleCrew>(_titleCrewRepository);
-        }
-
-        private async Task DownloadAndImportTitleEpisode()
-        {
-            await DownloadAndImportType<TitleEpisode>(_titleEpisodeRepository);
-        }
-
-        private async Task DownloadAndImportTitlePrincipals()
-        {
-            await DownloadAndImportType<TitlePrincipals>(_titlePrincipalsRepository);
-        }
-
-        private async Task DownloadAndImportTitleRatings()
-        {
-            await DownloadAndImportType<TitleRatings>(_titleRatingsRepository);
-        }
-
         private async Task DownloadAndImportType<T>(AbstractRepository<T> repository, string outputFileName = nameof(T)) where T : class
         {
             var file = await DownloadDataset(repository.Url, outputFileName);
@@ -159,7 +122,5 @@ namespace IMDb.Importer
                 repository.BulkSync(batch);
             }
         }
-
-        #endregion
     }
 }

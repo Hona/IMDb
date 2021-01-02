@@ -9,7 +9,7 @@ namespace IMDb.Infrastructure.Repositories
 {
     public class TitleEpisodeRepository : AbstractRepository<TitleEpisode>, ITitleEpisodeRepository
     {
-        public TitleEpisodeRepository(IDocumentStore store) : base(store) {}
+        public TitleEpisodeRepository(IDocumentStore store) : base(store) { }
 
         public async Task<TitleEpisode> FindByTConst(string tconst)
         {
@@ -62,9 +62,6 @@ namespace IMDb.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        protected override string GetUrl()
-        {
-            return "https://datasets.imdbws.com/title.episode.tsv.gz";
-        }
+        protected override string GetUrl() => "https://datasets.imdbws.com/title.episode.tsv.gz";
     }
 }

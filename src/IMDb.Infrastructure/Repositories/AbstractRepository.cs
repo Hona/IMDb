@@ -10,13 +10,7 @@ namespace IMDb.Infrastructure.Repositories
 {
     public abstract class AbstractRepository<T> : IRepository<T>
     {
-        public string Url
-        {
-            get
-            {
-                return GetUrl();
-            }
-        }
+        public string Url => GetUrl();
 
         protected readonly IDocumentStore _store;
 

@@ -10,7 +10,7 @@ namespace IMDb.Infrastructure.Repositories
 {
     public class TitleAKAsRepository : AbstractRepository<TitleAKAs>, ITitleAKAsRepository
     {
-        public TitleAKAsRepository(IDocumentStore store) : base(store){}
+        public TitleAKAsRepository(IDocumentStore store) : base(store) { }
 
         public async Task<TitleAKAs> FindByFullInfo(string tconst, int ordering)
         {
@@ -101,9 +101,6 @@ namespace IMDb.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        protected override string GetUrl()
-        {
-            return "https://datasets.imdbws.com/title.akas.tsv.gz";
-        }
+        protected override string GetUrl() => "https://datasets.imdbws.com/title.akas.tsv.gz";
     }
 }

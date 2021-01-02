@@ -10,7 +10,7 @@ namespace IMDb.Infrastructure.Repositories
 {
     public class TitleBasicsRepository : AbstractRepository<TitleBasics>, ITitleBasicsRepository
     {
-        public TitleBasicsRepository(IDocumentStore store) : base(store) {}
+        public TitleBasicsRepository(IDocumentStore store) : base(store) { }
 
         public async Task<TitleBasics> FindByTConst(string tconst)
         {
@@ -119,9 +119,6 @@ namespace IMDb.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        protected override string GetUrl()
-        {
-            return "https://datasets.imdbws.com/title.basics.tsv.gz";
-        }
+        protected override string GetUrl() => "https://datasets.imdbws.com/title.basics.tsv.gz";
     }
 }

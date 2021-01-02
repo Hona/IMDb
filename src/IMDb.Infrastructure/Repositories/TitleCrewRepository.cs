@@ -42,9 +42,6 @@ namespace IMDb.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        protected override string GetUrl()
-        {
-            return "https://datasets.imdbws.com/title.crew.tsv.gz";
-        }
+        protected override string GetUrl() => "https://datasets.imdbws.com/title.crew.tsv.gz";
     }
 }

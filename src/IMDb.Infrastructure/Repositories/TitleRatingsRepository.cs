@@ -9,7 +9,7 @@ namespace IMDb.Infrastructure.Repositories
 {
     public class TitleRatingsRepository : AbstractRepository<TitleRatings>, ITitleRatingsRepository
     {
-        public TitleRatingsRepository(IDocumentStore store) : base(store) {}
+        public TitleRatingsRepository(IDocumentStore store) : base(store) { }
 
         public async Task<TitleRatings> FindByTitle(string tconst)
         {
@@ -55,9 +55,6 @@ namespace IMDb.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        protected override string GetUrl()
-        {
-            return "https://datasets.imdbws.com/title.ratings.tsv.gz";
-        }
+        protected override string GetUrl() => "https://datasets.imdbws.com/title.ratings.tsv.gz";
     }
 }
