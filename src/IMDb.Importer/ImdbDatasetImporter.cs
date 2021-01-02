@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using IMDb.Core.Models;
 using IMDb.Core.Parsers;
+using IMDb.Core.Repositories;
 using IMDb.Infrastructure.Extensions;
 using IMDb.Infrastructure.Repositories;
 using Marten;
@@ -125,8 +126,10 @@ namespace IMDb.Importer
             return fileName;
         }
 
-        private async Task DownloadAndImportType<T>(AbstractRepository<T> repository, string outputFileName = nameof(T)) where T : class
+        private async Task DownloadAndImportType<T>(IRepository<T> repository, string outputFileName = null) where T : class
         {
+            outputFileName ??= typeof(T).Name;
+
             var file = await DownloadDataset(_repositoryUrls[typeof(T)], outputFileName);
             await using var fileStream = File.OpenRead(file);
 
