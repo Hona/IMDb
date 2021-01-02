@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    container_name: ImdbPostgres
+    # Secrets can be hard coded since the DB is not internet facing
+    environment:
+      - POSTGRES_USER=imdb
+      - POSTGRES_PASSWORD=imdb123
+      - POSTGRES_DB=imdb_db
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+  imdb-import:
+    build:
+      dockerfile: src/IMDb.Importer/Dockerfile
+      context: .
+    image: imdb-importer
+    container_name: ImdbImporter
+    restart: unless-stopped
+    volumes:
+      - ./imdb:/imdb 
+    environment:
+      - MARTEN_CONNECTION_STRING=User ID = imdb;Password=imdb123;Server=postgres;Port=5432;Database=imdb_db;Integrated Security=true;Pooling=true
+      - BATCH_SIZE=100000
+      - IMDB_BASE_PATH=/imdb
+      - DATABASE_NAME=imdb_db
+# Uncomment this for testing/debugging, to just do a dry run on the old files
+#      - SKIP_DOWNLOAD=yes

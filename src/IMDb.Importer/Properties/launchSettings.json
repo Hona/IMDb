@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "IMDb.Importer": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
