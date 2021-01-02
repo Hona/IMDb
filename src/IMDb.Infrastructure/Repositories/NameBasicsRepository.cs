@@ -79,7 +79,5 @@ namespace IMDb.Infrastructure.Repositories
                 .Take(pagination.Take)
                 .ToListAsync();
         }
-
-        protected override string GetUrl() => "https://datasets.imdbws.com/name.basics.tsv.gz";
     }
 }

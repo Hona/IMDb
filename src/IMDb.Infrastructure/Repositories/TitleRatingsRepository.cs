@@ -54,7 +54,5 @@ namespace IMDb.Infrastructure.Repositories
                 .Take(pagination.Take)
                 .ToListAsync();
         }
-
-        protected override string GetUrl() => "https://datasets.imdbws.com/title.ratings.tsv.gz";
     }
 }

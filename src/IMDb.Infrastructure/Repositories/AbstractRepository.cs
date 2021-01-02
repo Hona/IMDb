@@ -10,8 +10,6 @@ namespace IMDb.Infrastructure.Repositories
 {
     public abstract class AbstractRepository<T> : IRepository<T>
     {
-        public string Url => GetUrl();
-
         protected readonly IDocumentStore _store;
 
         public AbstractRepository(IDocumentStore store) => _store = store;
@@ -47,7 +45,5 @@ namespace IMDb.Infrastructure.Repositories
         {
             _store.BulkInsert(models.ToArray(), BulkInsertMode.OverwriteExisting);
         }
-
-        protected abstract string GetUrl();
     }
 }

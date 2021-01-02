@@ -29,6 +29,10 @@ namespace IMDb.Importer
         private readonly TitlePrincipalsRepository _titlePrincipalsRepository;
         private readonly TitleRatingsRepository _titleRatingsRepository;
 
+        private readonly string ImdbDatasetsDomain = "datasets.imdbws.com";
+
+        private readonly Dictionary<Type, string> _repositoryUrls;
+
         public ImdbDatasetImporter(ILogger logger)
         {
             _logger = logger;
@@ -61,6 +65,17 @@ namespace IMDb.Importer
             _titleEpisodeRepository = new TitleEpisodeRepository(Store);
             _titlePrincipalsRepository = new TitlePrincipalsRepository(Store);
             _titleRatingsRepository = new TitleRatingsRepository(Store);
+
+            _repositoryUrls = new Dictionary<Type, string>
+            {
+                { typeof(NameBasics), $"https://{ImdbDatasetsDomain}/name.basics.tsv.gz" },
+                { typeof(TitleAKAs), $"https://{ImdbDatasetsDomain}/title.akas.tsv.gz" },
+                { typeof(TitleBasics), $"https://{ImdbDatasetsDomain}/title.basics.tsv.gz" },
+                { typeof(TitleCrew), $"https://{ImdbDatasetsDomain}/title.crew.tsv.gz" },
+                { typeof(TitleEpisode), $"https://{ImdbDatasetsDomain}/title.episode.tsv.gz" },
+                { typeof(TitlePrincipals), $"https://{ImdbDatasetsDomain}/title.principals.tsv.gz" },
+                { typeof(TitleRatings), $"https://{ImdbDatasetsDomain}/title.ratings.tsv.gz" },
+            };
         }
 
         public IDocumentStore Store { get; }
@@ -112,7 +127,7 @@ namespace IMDb.Importer
 
         private async Task DownloadAndImportType<T>(AbstractRepository<T> repository, string outputFileName = nameof(T)) where T : class
         {
-            var file = await DownloadDataset(repository.Url, outputFileName);
+            var file = await DownloadDataset(_repositoryUrls[typeof(T)], outputFileName);
             await using var fileStream = File.OpenRead(file);
 
             var batches = _datasetParser.Parse<T>(fileStream);
