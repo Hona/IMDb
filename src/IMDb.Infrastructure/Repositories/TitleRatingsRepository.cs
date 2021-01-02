@@ -7,43 +7,9 @@ using Marten;
 
 namespace IMDb.Infrastructure.Repositories
 {
-    public class TitleRatingsRepository : ITitleRatingsRepository
+    public class TitleRatingsRepository : AbstractRepository<TitleRatings>, ITitleRatingsRepository
     {
-        private readonly IDocumentStore _store;
-
-        public TitleRatingsRepository(IDocumentStore store) => _store = store;
-
-        public async Task Add(TitleRatings model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Insert(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Update(TitleRatings model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Update(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Delete(TitleRatings model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Delete(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public void BulkSync(IEnumerable<TitleRatings> models)
-        {
-            _store.BulkInsert(models.ToArray(), BulkInsertMode.OverwriteExisting);
-        }
+        public TitleRatingsRepository(IDocumentStore store) : base(store) { }
 
         public async Task<TitleRatings> FindByTitle(string tconst)
         {

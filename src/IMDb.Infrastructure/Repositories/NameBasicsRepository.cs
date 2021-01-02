@@ -8,43 +8,9 @@ using Marten;
 
 namespace IMDb.Infrastructure.Repositories
 {
-    public class NameBasicsRepository : INameBasicsRepository
+    public class NameBasicsRepository : AbstractRepository<NameBasics>, INameBasicsRepository
     {
-        private readonly IDocumentStore _store;
-
-        public NameBasicsRepository(IDocumentStore store) => _store = store;
-
-        public async Task Add(NameBasics model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Insert(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Update(NameBasics model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Update(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Delete(NameBasics model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Delete(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public void BulkSync(IEnumerable<NameBasics> models)
-        {
-            _store.BulkInsert(models.ToArray(), BulkInsertMode.OverwriteExisting);
-        }
+        public NameBasicsRepository(IDocumentStore store) : base(store) { }
 
         public async Task<NameBasics> FindByNConst(string nconst)
         {

@@ -4,13 +4,8 @@ using IMDb.Core.Models;
 
 namespace IMDb.Core.Repositories
 {
-    public interface ITitleAKAsRepository
+    public interface ITitleAKAsRepository : IRepository<TitleAKAs>
     {
-        Task Add(TitleAKAs model);
-        Task Update(TitleAKAs model);
-        Task Delete(TitleAKAs model);
-        void BulkSync(IEnumerable<TitleAKAs> models);
-
         Task<TitleAKAs> FindByFullInfo(string tconst, int ordering);
         Task<IReadOnlyList<TitleAKAs>> FindByTitleId(string tconst);
 

@@ -4,13 +4,8 @@ using IMDb.Core.Models;
 
 namespace IMDb.Core.Repositories
 {
-    public interface ITitleBasicsRepository
+    public interface ITitleBasicsRepository : IRepository<TitleBasics>
     {
-        Task Add(TitleBasics model);
-        Task Update(TitleBasics model);
-        Task Delete(TitleBasics model);
-        void BulkSync(IEnumerable<TitleBasics> models);
-
         Task<TitleBasics> FindByTConst(string tconst);
 
         Task<IReadOnlyList<TitleBasics>> FindByTitleType(int page, string type);

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using IMDb.Core.Models;
 using IMDb.Core.Parsers;
+using IMDb.Core.Repositories;
 using IMDb.Infrastructure.Extensions;
 using IMDb.Infrastructure.Repositories;
 using Marten;
@@ -28,6 +29,10 @@ namespace IMDb.Importer
         private readonly TitleEpisodeRepository _titleEpisodeRepository;
         private readonly TitlePrincipalsRepository _titlePrincipalsRepository;
         private readonly TitleRatingsRepository _titleRatingsRepository;
+
+        private readonly string ImdbDatasetsDomain = "datasets.imdbws.com";
+
+        private readonly Dictionary<Type, string> _repositoryUrls;
 
         public ImdbDatasetImporter(ILogger logger)
         {
@@ -61,6 +66,17 @@ namespace IMDb.Importer
             _titleEpisodeRepository = new TitleEpisodeRepository(Store);
             _titlePrincipalsRepository = new TitlePrincipalsRepository(Store);
             _titleRatingsRepository = new TitleRatingsRepository(Store);
+
+            _repositoryUrls = new Dictionary<Type, string>
+            {
+                { typeof(NameBasics), $"https://{ImdbDatasetsDomain}/name.basics.tsv.gz" },
+                { typeof(TitleAKAs), $"https://{ImdbDatasetsDomain}/title.akas.tsv.gz" },
+                { typeof(TitleBasics), $"https://{ImdbDatasetsDomain}/title.basics.tsv.gz" },
+                { typeof(TitleCrew), $"https://{ImdbDatasetsDomain}/title.crew.tsv.gz" },
+                { typeof(TitleEpisode), $"https://{ImdbDatasetsDomain}/title.episode.tsv.gz" },
+                { typeof(TitlePrincipals), $"https://{ImdbDatasetsDomain}/title.principals.tsv.gz" },
+                { typeof(TitleRatings), $"https://{ImdbDatasetsDomain}/title.ratings.tsv.gz" },
+            };
         }
 
         public IDocumentStore Store { get; }
@@ -69,13 +85,13 @@ namespace IMDb.Importer
         {
             var tasks = new List<Task>
             {
-                DownloadAndImportNameBasics(),
-                DownloadAndImportTitleAKAs(),
-                DownloadAndImportTitleBasics(),
-                DownloadAndImportTitleCrew(),
-                DownloadAndImportTitleEpisode(),
-                DownloadAndImportTitlePrincipals(),
-                DownloadAndImportTitleRatings()
+                DownloadAndImportType(_nameBasicsRepository),
+                DownloadAndImportType(_titleAKAsRepository),
+                DownloadAndImportType(_titleBasicsRepository),
+                DownloadAndImportType(_titleCrewRepository),
+                DownloadAndImportType(_titleEpisodeRepository),
+                DownloadAndImportType(_titlePrincipalsRepository),
+                DownloadAndImportType(_titleRatingsRepository)
             };
 
             await Task.WhenAll(tasks);
@@ -110,102 +126,19 @@ namespace IMDb.Importer
             return fileName;
         }
 
-        // These could be refactored to have the shared logic in one spot, but its not that much code, so I don't mind for now
-
-        #region Individual Dataset Import Functions
-
-        private async Task DownloadAndImportNameBasics()
+        private async Task DownloadAndImportType<T>(IRepository<T> repository, string outputFileName = null) where T : class
         {
-            var file = await DownloadDataset("https://datasets.imdbws.com/name.basics.tsv.gz", nameof(NameBasics));
+            outputFileName ??= typeof(T).Name;
+
+            var file = await DownloadDataset(_repositoryUrls[typeof(T)], outputFileName);
             await using var fileStream = File.OpenRead(file);
 
-            var batches = _datasetParser.Parse<NameBasics>(fileStream);
+            var batches = _datasetParser.Parse<T>(fileStream);
 
             await foreach (var batch in batches)
             {
-                _nameBasicsRepository.BulkSync(batch);
+                repository.BulkSync(batch);
             }
         }
-
-        private async Task DownloadAndImportTitleAKAs()
-        {
-            var file = await DownloadDataset("https://datasets.imdbws.com/title.akas.tsv.gz", nameof(TitleAKAs));
-            await using var fileStream = File.OpenRead(file);
-
-            var batches = _datasetParser.Parse<TitleAKAs>(fileStream);
-
-            await foreach (var batch in batches)
-            {
-                _titleAKAsRepository.BulkSync(batch);
-            }
-        }
-
-        private async Task DownloadAndImportTitleBasics()
-        {
-            var file = await DownloadDataset("https://datasets.imdbws.com/title.basics.tsv.gz", nameof(TitleBasics));
-            await using var fileStream = File.OpenRead(file);
-
-            var batches = _datasetParser.Parse<TitleBasics>(fileStream);
-
-            await foreach (var batch in batches)
-            {
-                _titleBasicsRepository.BulkSync(batch);
-            }
-        }
-
-        private async Task DownloadAndImportTitleCrew()
-        {
-            var file = await DownloadDataset("https://datasets.imdbws.com/title.crew.tsv.gz", nameof(TitleCrew));
-            await using var fileStream = File.OpenRead(file);
-
-            var batches = _datasetParser.Parse<TitleCrew>(fileStream);
-
-            await foreach (var batch in batches)
-            {
-                _titleCrewRepository.BulkSync(batch);
-            }
-        }
-
-        private async Task DownloadAndImportTitleEpisode()
-        {
-            var file = await DownloadDataset("https://datasets.imdbws.com/title.episode.tsv.gz", nameof(TitleEpisode));
-            await using var fileStream = File.OpenRead(file);
-
-            var batches = _datasetParser.Parse<TitleEpisode>(fileStream);
-
-            await foreach (var batch in batches)
-            {
-                _titleEpisodeRepository.BulkSync(batch);
-            }
-        }
-
-        private async Task DownloadAndImportTitlePrincipals()
-        {
-            var file = await DownloadDataset("https://datasets.imdbws.com/title.principals.tsv.gz",
-                nameof(TitlePrincipals));
-            await using var fileStream = File.OpenRead(file);
-
-            var batches = _datasetParser.Parse<TitlePrincipals>(fileStream);
-
-            await foreach (var batch in batches)
-            {
-                _titlePrincipalsRepository.BulkSync(batch);
-            }
-        }
-
-        private async Task DownloadAndImportTitleRatings()
-        {
-            var file = await DownloadDataset("https://datasets.imdbws.com/title.ratings.tsv.gz", nameof(TitleRatings));
-            await using var fileStream = File.OpenRead(file);
-
-            var batches = _datasetParser.Parse<TitleRatings>(fileStream);
-
-            await foreach (var batch in batches)
-            {
-                _titleRatingsRepository.BulkSync(batch);
-            }
-        }
-
-        #endregion
     }
 }

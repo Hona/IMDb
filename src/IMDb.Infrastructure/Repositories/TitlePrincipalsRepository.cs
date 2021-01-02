@@ -8,43 +8,9 @@ using Marten;
 
 namespace IMDb.Infrastructure.Repositories
 {
-    public class TitlePrincipalsRepository : ITitlePrincipalsRepository
+    public class TitlePrincipalsRepository : AbstractRepository<TitlePrincipals>, ITitlePrincipalsRepository
     {
-        private readonly IDocumentStore _store;
-
-        public TitlePrincipalsRepository(IDocumentStore store) => _store = store;
-
-        public async Task Add(TitlePrincipals model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Insert(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Update(TitlePrincipals model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Update(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Delete(TitlePrincipals model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Delete(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public void BulkSync(IEnumerable<TitlePrincipals> models)
-        {
-            _store.BulkInsert(models.ToArray(), BulkInsertMode.OverwriteExisting);
-        }
+        public TitlePrincipalsRepository(IDocumentStore store) : base(store) { }
 
         public async Task<IReadOnlyList<TitlePrincipals>> FindByTitle(string tconst)
         {
