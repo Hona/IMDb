@@ -4,13 +4,8 @@ using IMDb.Core.Models;
 
 namespace IMDb.Core.Repositories
 {
-    public interface ITitleRatingsRepository
+    public interface ITitleRatingsRepository : IRepository<TitleRatings>
     {
-        Task Add(TitleRatings model);
-        Task Update(TitleRatings model);
-        Task Delete(TitleRatings model);
-        void BulkSync(IEnumerable<TitleRatings> models);
-
         Task<TitleRatings> FindByTitle(string tconst);
 
         Task<IReadOnlyList<TitleRatings>> FindByRating(int page, decimal rating, decimal deltaAllowed = 0);
