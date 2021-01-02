@@ -16,7 +16,7 @@ namespace IMDb.Infrastructure.Repositories
 
         public async Task Add(T model)
         {
-            using var session = _store.DirtyTrackedSession();
+            using var session = _store.LightweightSession();
 
             session.Insert(model);
 
@@ -25,7 +25,7 @@ namespace IMDb.Infrastructure.Repositories
 
         public async Task Update(T model)
         {
-            using var session = _store.DirtyTrackedSession();
+            using var session = _store.LightweightSession();
 
             session.Update(model);
 
@@ -34,7 +34,7 @@ namespace IMDb.Infrastructure.Repositories
 
         public async Task Delete(T model)
         {
-            using var session = _store.DirtyTrackedSession();
+            using var session = _store.LightweightSession();
 
             session.Delete(model);
 
