@@ -8,43 +8,9 @@ using Marten;
 
 namespace IMDb.Infrastructure.Repositories
 {
-    public class TitleAKAsRepository : ITitleAKAsRepository
+    public class TitleAKAsRepository : AbstractRepository<TitleAKAs>, ITitleAKAsRepository
     {
-        private readonly IDocumentStore _store;
-
-        public TitleAKAsRepository(IDocumentStore store) => _store = store;
-
-        public async Task Add(TitleAKAs model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Insert(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Update(TitleAKAs model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Update(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Delete(TitleAKAs model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Delete(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public void BulkSync(IEnumerable<TitleAKAs> models)
-        {
-            _store.BulkInsert(models.ToArray(), BulkInsertMode.OverwriteExisting);
-        }
+        public TitleAKAsRepository(IDocumentStore store) : base(store){}
 
         public async Task<TitleAKAs> FindByFullInfo(string tconst, int ordering)
         {
@@ -52,7 +18,6 @@ namespace IMDb.Infrastructure.Repositories
 
             return await session.Query<TitleAKAs>().SingleAsync(x => x.TitleId == tconst && x.Ordering == ordering);
         }
-
 
         public async Task<IReadOnlyList<TitleAKAs>> FindByTitleId(string tconst)
         {
@@ -134,6 +99,11 @@ namespace IMDb.Infrastructure.Repositories
                 .Skip(pagination.Skip)
                 .Take(pagination.Take)
                 .ToListAsync();
+        }
+
+        protected override string GetUrl()
+        {
+            return "https://datasets.imdbws.com/title.akas.tsv.gz";
         }
     }
 }

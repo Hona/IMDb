@@ -8,43 +8,9 @@ using Marten;
 
 namespace IMDb.Infrastructure.Repositories
 {
-    public class TitleBasicsRepository : ITitleBasicsRepository
+    public class TitleBasicsRepository : AbstractRepository<TitleBasics>, ITitleBasicsRepository
     {
-        private readonly IDocumentStore _store;
-
-        public TitleBasicsRepository(IDocumentStore store) => _store = store;
-
-        public async Task Add(TitleBasics model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Insert(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Update(TitleBasics model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Update(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Delete(TitleBasics model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Delete(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public void BulkSync(IEnumerable<TitleBasics> models)
-        {
-            _store.BulkInsert(models.ToArray(), BulkInsertMode.OverwriteExisting);
-        }
+        public TitleBasicsRepository(IDocumentStore store) : base(store) {}
 
         public async Task<TitleBasics> FindByTConst(string tconst)
         {
@@ -151,6 +117,11 @@ namespace IMDb.Infrastructure.Repositories
                 .Skip(pagination.Skip)
                 .Take(pagination.Take)
                 .ToListAsync();
+        }
+
+        protected override string GetUrl()
+        {
+            return "https://datasets.imdbws.com/title.basics.tsv.gz";
         }
     }
 }

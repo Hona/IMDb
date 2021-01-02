@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using IMDb.Core.Models;
 using IMDb.Core.Parsers;
-using IMDb.Core.Repositories;
 using IMDb.Infrastructure.Extensions;
 using IMDb.Infrastructure.Repositories;
 using Marten;
@@ -115,43 +114,42 @@ namespace IMDb.Importer
 
         private async Task DownloadAndImportNameBasics()
         {
-            await DownloadAndImportType<NameBasics>("https://datasets.imdbws.com/name.basics.tsv.gz", _nameBasicsRepository);
+            await DownloadAndImportType<NameBasics>(_nameBasicsRepository);
         }
-
 
         private async Task DownloadAndImportTitleAKAs()
         {
-            await DownloadAndImportType<TitleAKAs>("https://datasets.imdbws.com/title.akas.tsv.gz", _titleAKAsRepository);
+            await DownloadAndImportType<TitleAKAs>(_titleAKAsRepository);
         }
 
         private async Task DownloadAndImportTitleBasics()
         {
-            await DownloadAndImportType<TitleBasics>("https://datasets.imdbws.com/title.basics.tsv.gz", _titleBasicsRepository);
+            await DownloadAndImportType<TitleBasics>(_titleBasicsRepository);
         }
 
         private async Task DownloadAndImportTitleCrew()
         {
-            await DownloadAndImportType<TitleCrew>("https://datasets.imdbws.com/title.crew.tsv.gz", _titleCrewRepository);
+            await DownloadAndImportType<TitleCrew>(_titleCrewRepository);
         }
 
         private async Task DownloadAndImportTitleEpisode()
         {
-            await DownloadAndImportType<TitleEpisode>("https://datasets.imdbws.com/title.episode.tsv.gz", _titleEpisodeRepository);
+            await DownloadAndImportType<TitleEpisode>(_titleEpisodeRepository);
         }
 
         private async Task DownloadAndImportTitlePrincipals()
         {
-            await DownloadAndImportType<TitlePrincipals>("https://datasets.imdbws.com/title.principals.tsv.gz", _titlePrincipalsRepository);
+            await DownloadAndImportType<TitlePrincipals>(_titlePrincipalsRepository);
         }
 
         private async Task DownloadAndImportTitleRatings()
         {
-            await DownloadAndImportType<TitleRatings>("https://datasets.imdbws.com/title.ratings.tsv.gz", _titleRatingsRepository);
+            await DownloadAndImportType<TitleRatings>(_titleRatingsRepository);
         }
 
-        private async Task DownloadAndImportType<T>(string url, IRepository<T> repository, string outputFileName = nameof(T)) where T : class
+        private async Task DownloadAndImportType<T>(AbstractRepository<T> repository, string outputFileName = nameof(T)) where T : class
         {
-            var file = await DownloadDataset(url, outputFileName);
+            var file = await DownloadDataset(repository.Url, outputFileName);
             await using var fileStream = File.OpenRead(file);
 
             var batches = _datasetParser.Parse<T>(fileStream);

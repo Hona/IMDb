@@ -7,43 +7,9 @@ using Marten;
 
 namespace IMDb.Infrastructure.Repositories
 {
-    public class TitleEpisodeRepository : ITitleEpisodeRepository
+    public class TitleEpisodeRepository : AbstractRepository<TitleEpisode>, ITitleEpisodeRepository
     {
-        private readonly IDocumentStore _store;
-
-        public TitleEpisodeRepository(IDocumentStore store) => _store = store;
-
-        public async Task Add(TitleEpisode model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Insert(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Update(TitleEpisode model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Update(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public async Task Delete(TitleEpisode model)
-        {
-            using var session = _store.DirtyTrackedSession();
-
-            session.Delete(model);
-
-            await session.SaveChangesAsync();
-        }
-
-        public void BulkSync(IEnumerable<TitleEpisode> models)
-        {
-            _store.BulkInsert(models.ToArray(), BulkInsertMode.OverwriteExisting);
-        }
+        public TitleEpisodeRepository(IDocumentStore store) : base(store) {}
 
         public async Task<TitleEpisode> FindByTConst(string tconst)
         {
@@ -94,6 +60,11 @@ namespace IMDb.Infrastructure.Repositories
                 .Skip(pagination.Skip)
                 .Take(pagination.Take)
                 .ToListAsync();
+        }
+
+        protected override string GetUrl()
+        {
+            return "https://datasets.imdbws.com/title.episode.tsv.gz";
         }
     }
 }
